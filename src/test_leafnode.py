@@ -3,7 +3,7 @@ import unittest
 from leafnode import LeafNode
 
 
-class TestleafNode(unittest.TestCase):
+class TestLeafNode(unittest.TestCase):
     def test_leaf_to_html_p(self):
         node = LeafNode("p", "Hello, world!")
         self.assertEqual(node.to_html(), "<p>Hello, world!</p>")
@@ -15,10 +15,12 @@ class TestleafNode(unittest.TestCase):
         self.assertEqual(node.to_html(), "i have no tag")
     def test_leaf_to_html_novalue(self):
         node = LeafNode("p", None)
-        self.assertRaises(ValueError)
+        with self.assertRaises(ValueError):
+            node.to_html()
     def test_leaf_to_html_empty(self):
         node = LeafNode(None, None)
-        self.assertRaises(ValueError)
+        with self.assertRaises(ValueError):
+            node.to_html()
 
 
 
