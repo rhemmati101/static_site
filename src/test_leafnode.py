@@ -15,11 +15,11 @@ class TestLeafNode(unittest.TestCase):
         self.assertEqual(node.to_html(), "i have no tag")
     def test_leaf_to_html_novalue(self):
         node = LeafNode("p", None)
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex(ValueError, "Leaf node must have a value"):
             node.to_html()
     def test_leaf_to_html_empty(self):
         node = LeafNode(None, None)
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex(ValueError, "Leaf node must have a value"):
             node.to_html()
 
 
