@@ -1,9 +1,10 @@
 from textnode import TextType
 from textnode import TextNode
+from htmlnode import HTMLNode
 from leafnode import LeafNode
 
 
-def text_node_to_html_node(text_node: 'TextNode') -> 'LeafNode':
+def text_node_to_html_node(text_node: TextNode) -> LeafNode:
     match text_node.text_type:
         case TextType.TEXT.value:
             return LeafNode(tag=None, value=text_node.text)
@@ -19,3 +20,29 @@ def text_node_to_html_node(text_node: 'TextNode') -> 'LeafNode':
             return LeafNode(tag="img", value="", props={"src":text_node.url, "alt":text_node.text})
         case _:
             raise Exception(f"{text_node.text_type} is not a supported text type")
+        
+def split_nodes_delimiter(
+        old_nodes: list[HTMLNode], delimiter: str, text_type: TextType
+        ) -> list[HTMLNode]:
+    new_nodes: list[HTMLNode] = []
+    
+    for node in old_nodes:
+        if node.text_type != TextType.TEXT.value:
+            new_nodes.append(node)
+        else:
+            split_nodes: list[str] = node.text.split(delimiter)
+            if len(split_nodes) == 1: #case: no delims in text
+                new_nodes.append(node)
+            elif len(split_nodes) == 2: #case: 1 delim? not valid markdown
+                raise Exception(f"missing matching delimiter")
+            elif len(split_nodes) == 3: #case: 2 delims, expected input!
+                new_nodes.extend([
+                    TextNode(text=split_nodes[0], text_type=TextType.TEXT),
+                    TextNode(text=split_nodes[1], text_type=text_type),
+                    TextNode(text=split_nodes[2], text_type=TextType.TEXT)
+                ])
+            else:
+                raise NotImplementedError() #what amazing casework!!!
+              
+
+    return new_nodes
