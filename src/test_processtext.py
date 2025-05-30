@@ -165,6 +165,35 @@ class TestProcessText(unittest.TestCase):
             ],
             new_nodes,
         )
+    def test_split_images_no_img(self):
+        node = TextNode(
+            "This is text without an image",
+            TextType.TEXT,
+        )
+        new_nodes = split_nodes_image([node])
+        self.assertListEqual(
+            [TextNode("This is text without an image", TextType.TEXT)],
+            new_nodes,
+        )
+    def test_split_images_non_text_nodes(self):
+        nodes = [
+            TextNode("This is text without an image",TextType.TEXT,),
+            TextNode("This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and another ![second image](https://i.imgur.com/3elNhQu.png)",TextType.TEXT),
+            TextNode("This isn't a text node", TextType.BOLD)
+        ]
+        new_nodes = split_nodes_image(nodes)
+        self.assertListEqual([
+            TextNode("This is text without an image", TextType.TEXT),
+            TextNode("This is text with an ", TextType.TEXT),
+                TextNode("image", TextType.IMAGE, "https://i.imgur.com/zjjcJKZ.png"),
+                TextNode(" and another ", TextType.TEXT),
+                TextNode(
+                    "second image", TextType.IMAGE, "https://i.imgur.com/3elNhQu.png"
+                ),
+            TextNode("This isn't a text node", TextType.BOLD)
+        ],
+            new_nodes,
+        )
     def test_split_images_ends_in_text(self):
         node = TextNode(
             "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and another ![second image](https://i.imgur.com/3elNhQu.png) and some text",
@@ -217,7 +246,7 @@ class TestProcessText(unittest.TestCase):
         nodes = [
             TextNode("This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and a [link](https://i.imgur.com)", TextType.TEXT),
             TextNode("This is text with another ![image](https://google.com???)", TextType.TEXT)
-        ],
+        ]
 
         new_nodes = split_nodes_image(nodes)
         self.assertListEqual(
