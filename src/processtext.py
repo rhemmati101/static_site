@@ -71,12 +71,12 @@ def split_nodes_image(old_nodes: list[HTMLNode]) -> list[HTMLNode]:
                     split: list[str] = txt.split(img_txt)
 
                     # at this point, split should be len 3 with [pre, split, post]
-                    # post can be "", which we don't want to turn into a node
+                    # pre and post can be "", which we don't want to turn into a node
 
-                    new_nodes.extend([
-                        TextNode(text=split[0], text_type=TextType.TEXT),
-                        TextNode(text=image[0],text_type=TextType.IMAGE,url=image[1]),
-                    ])
+                    if split[0] != "":
+                        new_nodes.append(TextNode(text=split[0], text_type=TextType.TEXT))
+
+                    new_nodes.append(TextNode(text=image[0],text_type=TextType.IMAGE,url=image[1]))
                     
                     txt = split[1]
                 
