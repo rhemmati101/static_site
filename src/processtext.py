@@ -67,17 +67,20 @@ def split_nodes_image(old_nodes: list[HTMLNode]) -> list[HTMLNode]:
                 new_nodes.append(node)
             else:
                 for image in images:
+                    img_txt = f"![{image[0]}]({image[1]})"
+                    split: list[str] = txt.split(img_txt)
+
+                    # at this point, split should be len 3 with [pre, split, post]
+                    # post can be "", which we don't want to turn into a node
+
                     new_nodes.extend([
-                        TextNode(text=txt[:txt.find("![")], text_type=TextType.TEXT),
+                        TextNode(text=split[0], text_type=TextType.TEXT),
                         TextNode(text=image[0],text_type=TextType.IMAGE,url=image[1]),
                     ])
-                    img_end = txt.find(")")
-                    if img_end == len(txt) - 1:   #last part of text is an image
-                        txt = ""
-                    else:
-                        txt = txt[txt.find(")")+1:]
+                    
+                    txt = split[1]
                 
-                if txt != "":
+                if txt != "":    #don't create a new textnode after an image ends the text
                     new_nodes.append(TextNode(text=txt,text_type=TextType.TEXT))
 
     return new_nodes
