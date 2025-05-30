@@ -259,6 +259,76 @@ class TestProcessText(unittest.TestCase):
             ],
             new_nodes,
         )
+    
+    def test_split_links_starts_n_ends_w_link(self):
+        node = TextNode(
+            "[link](https://google.com) and another [second link](https://youtube.com)",
+            TextType.TEXT,
+        )
+        new_nodes = split_nodes_link([node])
+        self.assertListEqual(
+            [
+                TextNode("link", TextType.LINK, "https://google.com"),
+                TextNode(" and another ", TextType.TEXT),
+                TextNode(
+                    "second link", TextType.LINK, "https://youtube.com"
+                ),
+            ],
+            new_nodes,
+        )
+    def test_split_links_starts_n_ends_w_text(self):
+        node = TextNode(
+            "This has a [link](https://google.com) and another...somewhere",
+            TextType.TEXT,
+        )
+        new_nodes = split_nodes_link([node])
+        self.assertListEqual(
+            [
+                TextNode("This has a ", TextType.TEXT),
+                TextNode("link", TextType.LINK, "https://google.com"),
+                TextNode(" and another...somewhere", TextType.TEXT)
+            ],
+            new_nodes,
+        )
+    def test_split_links_no_links(self):
+        node = TextNode("This has no links :c",TextType.TEXT)
+        new_nodes = split_nodes_link([node])
+        self.assertListEqual(
+            [TextNode("This has no links :c",TextType.TEXT)],
+            new_nodes,
+        )
+    def test_split_links_with_image(self):
+        node = TextNode(
+            "[link](https://google.com) and an ![image](https://img.pokemondb.net/artwork/large/leafeon.jpg)",
+            TextType.TEXT,
+        )
+        new_nodes = split_nodes_link([node])
+        self.assertListEqual(
+            [
+                TextNode("link", TextType.LINK, "https://google.com"),
+                TextNode(" and an ![image](https://img.pokemondb.net/artwork/large/leafeon.jpg)", TextType.TEXT)
+            ],
+            new_nodes,
+        )
+    def test_split_links_multinode(self):
+        nodes = [
+            TextNode("[link](https://google.com) and another [second link](https://youtube.com)",TextType.TEXT,),
+            TextNode("This is in bold", TextType.BOLD),
+            TextNode("This has another [link](https://pokemondb.net/pokedex/ledian).", TextType.TEXT)
+        ]
+        new_nodes = split_nodes_link(nodes)
+        self.assertListEqual(
+            [
+                TextNode("link", TextType.LINK, "https://google.com"),
+                TextNode(" and another ", TextType.TEXT),
+                TextNode("second link", TextType.LINK, "https://youtube.com"),
+                TextNode("This is in bold", TextType.BOLD),
+                TextNode("This has another ", TextType.TEXT),
+                TextNode("link", TextType.LINK, "https://pokemondb.net/pokedex/ledian"),
+                TextNode(".", TextType.TEXT)
+            ],
+            new_nodes,
+        )
 
 if __name__ == "__main__":
     unittest.main()

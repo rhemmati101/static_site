@@ -88,7 +88,31 @@ def split_nodes_image(old_nodes: list[HTMLNode]) -> list[HTMLNode]:
 def split_nodes_link(old_nodes: list[HTMLNode]) -> list[HTMLNode]:
     new_nodes: list[HTMLNode] = []
 
-    
+    for node in old_nodes:
+        if node.text_type != TextType.TEXT.value:
+            new_nodes.append(node)
+        else:
+            txt = node.text
+            links: list[tuple[str,str]] = extract_markdown_links(txt)
+            if not links:
+                new_nodes.append(node)
+            else:
+                for link in links:
+                    link_txt = f"[{link[0]}]({link[1]})"   #can fail if there is img w same attributes
+                    split: list[str] = txt.split(link_txt)
+
+                    # at this point, split should be len 3 with [pre, split, post]
+                    # pre and post can be "", which we don't want to turn into a node
+
+                    if split[0] != "":
+                        new_nodes.append(TextNode(text=split[0], text_type=TextType.TEXT))
+
+                    new_nodes.append(TextNode(text=link[0],text_type=TextType.LINK,url=link[1]))
+                    
+                    txt = split[1]
+                
+                if txt != "":    #don't create a new textnode after an image ends the text
+                    new_nodes.append(TextNode(text=txt,text_type=TextType.TEXT))
 
     return new_nodes
 
