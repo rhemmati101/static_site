@@ -102,6 +102,22 @@ class TestProcessText(unittest.TestCase):
              TextNode(" in it", TextType.TEXT),
              TextNode("This node is **in** italic", TextType.ITALIC)]
         )
+    def test_split_node_delimiter_multi_delim(self):
+        node = TextNode("This has **bold** in **it**", TextType.TEXT)
+        self.assertEqual(
+            split_nodes_delimiter([node], "**", TextType.BOLD),
+            [TextNode("This has ", TextType.TEXT),
+             TextNode("bold", TextType.BOLD),
+             TextNode(" in ", TextType.TEXT),
+             TextNode("it", TextType.BOLD),]
+        )
+    def test_split_node_delimiter_delim_at_start(self):
+        node = TextNode("_This_ is a crafting table", TextType.TEXT)
+        self.assertEqual(
+            split_nodes_delimiter([node], "_", TextType.ITALIC),
+            [TextNode("This", TextType.ITALIC),
+             TextNode(" is a crafting table", TextType.TEXT)]
+        )
 
     def test_extract_markdown_images_basic(self):
         matches = extract_markdown_images(
