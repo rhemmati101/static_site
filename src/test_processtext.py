@@ -8,6 +8,8 @@ from processtext import text_node_to_html_node
 from processtext import split_nodes_delimiter
 from processtext import extract_markdown_images
 from processtext import extract_markdown_links
+from processtext import split_nodes_image
+from processtext import split_nodes_link
 
 class TestProcessText(unittest.TestCase):
     def test_html_to_leaf_plain(self):
@@ -145,6 +147,24 @@ class TestProcessText(unittest.TestCase):
         "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png)"
         )
         self.assertListEqual([], matches)
+
+    def test_split_images_ends_in_img(self):
+        node = TextNode(
+            "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and another ![second image](https://i.imgur.com/3elNhQu.png)",
+            TextType.TEXT,
+        )
+        new_nodes = split_nodes_image([node])
+        self.assertListEqual(
+            [
+                TextNode("This is text with an ", TextType.TEXT),
+                TextNode("image", TextType.IMAGE, "https://i.imgur.com/zjjcJKZ.png"),
+                TextNode(" and another ", TextType.TEXT),
+                TextNode(
+                    "second image", TextType.IMAGE, "https://i.imgur.com/3elNhQu.png"
+                ),
+            ],
+            new_nodes,
+        )
 
 if __name__ == "__main__":
     unittest.main()
