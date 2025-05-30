@@ -54,6 +54,42 @@ def extract_markdown_images(text: str) -> list[tuple[str,str]]:
 def extract_markdown_links(text: str) -> list[tuple[str,str]]:
     return re.findall(r"(?<!!)\[([^\[\]]*)\]\(([^\(\)]*)\)", text)
 
+def split_nodes_image(old_nodes: list[HTMLNode]) -> list[HTMLNode]:
+    new_nodes: list[HTMLNode] = []
+
+    for node in old_nodes:
+        if node.text_type != TextType.TEXT.value:
+            new_nodes.append(node)
+        else:
+            txt = node.text
+            images: list[tuple[str,str]] = extract_markdown_images(txt)
+            if not images:
+                new_nodes.append(node)
+            else:
+                for i in range(len(images)):
+                    new_nodes.extend(
+                        TextNode(text=txt[:txt.find("![")], text_type=TextType.TEXT),
+                        TextNode(text=images[i][0],text_type=TextType.IMAGE,url=images[i][1]),
+                    )
+                    img_end = txt.find(")")
+                    if img_end == len(txt) - 1:   #last part of text is an image
+                        txt = ""
+                    else:
+                        txt = txt[txt.find(")")+1:]
+                
+                if txt != "":
+                    new_nodes.append(TextNode(text=txt,text_type=TextType.TEXT))
+
+    return new_nodes
+
+def split_nodes_link(old_nodes: list[HTMLNode]) -> list[HTMLNode]:
+    new_nodes: list[HTMLNode] = []
+
+    
+
+    return new_nodes
+
+
               
 
     
