@@ -122,7 +122,12 @@ def split_nodes_link(old_nodes: list[HTMLNode]) -> list[HTMLNode]:
 
     return new_nodes
 
+def text_to_textnodes(text: str) -> list[TextNode]:
+    text_nodes: list[TextNode] = []
 
+    text_nodes = split_nodes_link(split_nodes_image(split_nodes_delimiter(split_nodes_delimiter(split_nodes_delimiter([text], "`",TextType.CODE), "_", TextType.ITALIC), "**", TextType.BOLD)))
+
+    return text_nodes
               
 
     
