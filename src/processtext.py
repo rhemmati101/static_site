@@ -24,9 +24,9 @@ def text_node_to_html_node(text_node: TextNode) -> LeafNode:
             raise Exception(f"{text_node.text_type} is not a supported text type")
         
 def split_nodes_delimiter(
-        old_nodes: list[HTMLNode], delimiter: str, text_type: TextType
-        ) -> list[HTMLNode]:
-    new_nodes: list[HTMLNode] = []
+        old_nodes: list[TextNode], delimiter: str, text_type: TextType
+        ) -> list[TextNode]:
+    new_nodes: list[TextNode] = []
     
     for node in old_nodes:
         if node.text_type != TextType.TEXT.value:
@@ -55,8 +55,8 @@ def extract_markdown_images(text: str) -> list[tuple[str,str]]:
 def extract_markdown_links(text: str) -> list[tuple[str,str]]:
     return re.findall(r"(?<!!)\[([^\[\]]*)\]\(([^\(\)]*)\)", text)
 
-def split_nodes_image(old_nodes: list[HTMLNode]) -> list[HTMLNode]:
-    new_nodes: list[HTMLNode] = []
+def split_nodes_image(old_nodes: list[TextNode]) -> list[TextNode]:
+    new_nodes: list[TextNode] = []
 
     for node in old_nodes:
         if node.text_type != TextType.TEXT.value:
@@ -88,8 +88,8 @@ def split_nodes_image(old_nodes: list[HTMLNode]) -> list[HTMLNode]:
 
     return new_nodes
 
-def split_nodes_link(old_nodes: list[HTMLNode]) -> list[HTMLNode]:
-    new_nodes: list[HTMLNode] = []
+def split_nodes_link(old_nodes: list[TextNode]) -> list[TextNode]:
+    new_nodes: list[TextNode] = []
 
     for node in old_nodes:
         if node.text_type != TextType.TEXT.value:
@@ -122,10 +122,11 @@ def split_nodes_link(old_nodes: list[HTMLNode]) -> list[HTMLNode]:
 
     return new_nodes
 
-def text_to_textnodes(text: str) -> list[TextNode]:
+def text_to_textnodes(txt: str) -> list[TextNode]:
     text_nodes: list[TextNode] = []
+    overall_text: TextNode = TextNode(text=txt, text_type=TextType.TEXT)
 
-    text_nodes = split_nodes_link(split_nodes_image(split_nodes_delimiter(split_nodes_delimiter(split_nodes_delimiter([text], "`",TextType.CODE), "_", TextType.ITALIC), "**", TextType.BOLD)))
+    text_nodes = split_nodes_link(split_nodes_image(split_nodes_delimiter(split_nodes_delimiter(split_nodes_delimiter([overall_text], "`",TextType.CODE), "_", TextType.ITALIC), "**", TextType.BOLD)))
 
     return text_nodes
               

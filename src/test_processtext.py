@@ -348,7 +348,7 @@ class TestProcessText(unittest.TestCase):
         )
 
     def test_text_to_textnodes_all_types(self):
-        text = TextNode("This is **text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)", TextType.TEXT)
+        text = "This is **text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
 
         self.assertEqual(
             text_to_textnodes(text),
@@ -366,7 +366,7 @@ class TestProcessText(unittest.TestCase):
             ]
         )
     def test_text_to_textnodes_double_delimiters(self):
-        text = TextNode("This is **text** _with_ **two** _double_ delimiters", TextType.TEXT)
+        text = "This is **text** _with_ **two** _double_ delimiters"
 
         self.assertEqual(
             text_to_textnodes(text),
