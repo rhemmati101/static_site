@@ -4,15 +4,15 @@ from leafnode import LeafNode
 from textnode import TextNode
 from textnode import TextType
 
-from processtext import text_node_to_html_node
-from processtext import split_nodes_delimiter
-from processtext import extract_markdown_images
-from processtext import extract_markdown_links
-from processtext import split_nodes_image
-from processtext import split_nodes_link
-from processtext import text_to_textnodes
+from processinlinetext import text_node_to_html_node
+from processinlinetext import split_nodes_delimiter
+from processinlinetext import extract_markdown_images
+from processinlinetext import extract_markdown_links
+from processinlinetext import split_nodes_image
+from processinlinetext import split_nodes_link
+from processinlinetext import text_to_textnodes
 
-class TestProcessText(unittest.TestCase):
+class TestProcessInlineText(unittest.TestCase):
     def test_html_to_leaf_plain(self):
         node = TextNode("This is a text node", TextType.TEXT)
         html_node = text_node_to_html_node(node)
@@ -47,7 +47,7 @@ class TestProcessText(unittest.TestCase):
         self.assertEqual(html_node.props, {"src":"google.com blah blah", "alt":"This is an image node"})
     def test_html_to_leaf_other_type(self):
         with self.assertRaises(Exception):
-            node = TextNode("This is a weird node", TextType.WEIRD)
+            node = TextNode("This is a weird node", TextType.WEIRD) # type: ignore
             # if the above line doesn't fail, the texttype must be valid
             # html_node = text_node_to_html_node(node)
 
