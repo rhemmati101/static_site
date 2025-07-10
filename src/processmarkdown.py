@@ -1,0 +1,72 @@
+from htmlnode import HTMLNode
+from parentnode import ParentNode
+from leafnode import LeafNode
+from processinlinetext import text_to_textnodes, text_node_to_html_node
+from processblocktext import markdown_to_blocks, BlockType, block_to_blocktype
+
+import re
+
+
+#return parent htmlnode
+def markdown_to_html(markdown: str) -> ParentNode:
+    html_blocks: list[ParentNode] = []
+
+    #split string into blocks
+    text_blocks: list[str] = markdown_to_blocks(markdown)
+
+    #for each block, create htmlnode with tag based on blocktype
+    for text_block in text_blocks:
+        block_type: BlockType = block_to_blocktype(text_block)
+        
+        if block_type != BlockType.CODE:
+            text: str = extract_text(text_block, block_type)
+            children: list[HTMLNode] = text_to_children(text, block_type)
+
+            tag: str = get_block_tag(text_block)
+            html_block = ParentNode(tag=tag, children=children)
+        else:
+            inner_block = LeafNode(tag="code", value=text_block)
+            html_block = ParentNode(tag="pre", children=[inner_block])
+
+        html_blocks.append(html_block)
+
+    return ParentNode(tag="div", children=html_blocks)
+
+
+def extract_text(text_block: str, block_type: BlockType) -> str:
+    text: str = ""
+
+    
+
+    return text
+
+
+def text_to_children(text: str, block_type: BlockType) -> list[HTMLNode]:
+    children: list[HTMLNode] = []
+
+    if block_type != BlockType.OLIST and block_type != BlockType.UNOLIST:
+        children = list(map(text_node_to_html_node, text_to_textnodes(text)))
+    else:
+        items: list[str] = text.split("\n")
+        for item in items:
+            children.append(LeafNode(tag="li", value=item))
+
+    return children
+
+
+def get_block_tag(text_block: str) -> str:
+    block_type: BlockType = block_to_blocktype(text_block)
+    
+    match block_type:
+        case BlockType.QUOTE:
+            return "blockquote"
+        case BlockType.UNOLIST:
+            return "ul"
+        case BlockType.OLIST:
+            return "ol"
+        case BlockType.PARAGRAPH:
+            return "p"
+        case BlockType.HEADING:
+            return len(re.findall(r"^(#+)", text_block))*"#"
+        case _:
+            raise Exception("no valid block type tag found (or not implemented!!)")
