@@ -17,15 +17,14 @@ def markdown_to_html(markdown: str) -> ParentNode:
     #for each block, create htmlnode with tag based on blocktype
     for text_block in text_blocks:
         block_type: BlockType = block_to_blocktype(text_block)
+        text: str = extract_text(text_block, block_type)
         
         if block_type != BlockType.CODE:
-            text: str = extract_text(text_block, block_type)
             children: list[HTMLNode] = text_to_children(text, block_type)
-
             tag: str = get_block_tag(text_block)
             html_block = ParentNode(tag=tag, children=children)
         else:
-            inner_block = LeafNode(tag="code", value=text_block)
+            inner_block = LeafNode(tag="code", value=text)
             html_block = ParentNode(tag="pre", children=[inner_block])
 
         html_blocks.append(html_block)
@@ -34,11 +33,24 @@ def markdown_to_html(markdown: str) -> ParentNode:
 
 
 def extract_text(text_block: str, block_type: BlockType) -> str:
-    text: str = ""
-
-    
-
-    return text
+    match block_type:
+        case BlockType.QUOTE:
+            return "\n".join(re.findall(r"^>([^\n]*)$", text_block, flags=re.MULTILINE))
+        case BlockType.CODE:
+            return text_block.strip("```").strip()
+        case BlockType.HEADING:
+            match = re.match(r"^#{1,6} ([^\n]*)$", text_block)
+            if match:
+                return match.group(0)
+            raise ValueError("invalid heading block??")
+        case BlockType.UNOLIST:
+            return "\n".join(re.findall(r"^- ([^\n]*)$", text_block, flags=re.MULTILINE))
+        case BlockType.OLIST:
+            return "\n".join(re.findall(r"^\d+\. ([^\n]*)$", text_block, flags=re.MULTILINE))
+        case BlockType.PARAGRAPH:
+            return text_block
+        case _:
+            raise NotImplementedError()
 
 
 def text_to_children(text: str, block_type: BlockType) -> list[HTMLNode]:
@@ -49,7 +61,9 @@ def text_to_children(text: str, block_type: BlockType) -> list[HTMLNode]:
     else:
         items: list[str] = text.split("\n")
         for item in items:
-            children.append(LeafNode(tag="li", value=item))
+            item_children = list(map(text_node_to_html_node, text_to_textnodes(item)))
+            item_block = ParentNode(tag="li", children=item_children)
+            children.append(item_block)
 
     return children
 
