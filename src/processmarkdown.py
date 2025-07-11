@@ -8,7 +8,7 @@ import re
 
 
 #return parent htmlnode
-def markdown_to_html(markdown: str) -> ParentNode:
+def markdown_to_html_node(markdown: str) -> ParentNode:
     html_blocks: list[ParentNode] = []
 
     #split string into blocks
@@ -37,7 +37,7 @@ def extract_text(text_block: str, block_type: BlockType) -> str:
         case BlockType.QUOTE:
             return "\n".join(re.findall(r"^>([^\n]*)$", text_block, flags=re.MULTILINE))
         case BlockType.CODE:
-            return text_block.strip("```").strip()
+            return text_block.strip("```").lstrip()
         case BlockType.HEADING:
             match = re.match(r"^#{1,6} ([^\n]*)$", text_block)
             if match:
@@ -48,7 +48,7 @@ def extract_text(text_block: str, block_type: BlockType) -> str:
         case BlockType.OLIST:
             return "\n".join(re.findall(r"^\d+\. ([^\n]*)$", text_block, flags=re.MULTILINE))
         case BlockType.PARAGRAPH:
-            return text_block
+            return " ".join(text_block.split("\n"))
         case _:
             raise NotImplementedError()
 
