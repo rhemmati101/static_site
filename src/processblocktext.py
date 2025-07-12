@@ -22,7 +22,7 @@ def markdown_to_blocks(markdown: str) -> list[str]:
     return blocks
 
 def block_to_blocktype(block: str) -> BlockType:
-    if re.match(r"^#{1,6} [^\n]*$", block):
+    if re.match(r"^#{1,6} +[^\n]*$", block):
         return BlockType.HEADING
     
     if block.startswith("```") and block.endswith("```"):

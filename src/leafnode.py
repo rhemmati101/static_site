@@ -11,6 +11,11 @@ class LeafNode(HTMLNode):
             raise ValueError("Leaf node must have a value")
         if self.tag == None:
             return self.value
+        if self.props:
+            if "href" in self.props:  #link
+                return f"<a href='{self.props['href']}'>{self.value}</a>"
+            elif "src" in self.props:  #image
+                return f"<img src='{self.props['src']}' alt='{self.props['alt']}' />"
         return f"<{self.tag}>{self.value}</{self.tag}>"
         
 

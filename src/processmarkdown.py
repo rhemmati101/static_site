@@ -35,18 +35,18 @@ def markdown_to_html_node(markdown: str) -> ParentNode:
 def extract_text(text_block: str, block_type: BlockType) -> str:
     match block_type:
         case BlockType.QUOTE:
-            return "\n".join(re.findall(r"^>([^\n]*)$", text_block, flags=re.MULTILINE))
+            return "\n".join(re.findall(r"^> *([^\n]*)$", text_block, flags=re.MULTILINE))
         case BlockType.CODE:
             return text_block.strip("```").lstrip()
         case BlockType.HEADING:
-            match = re.match(r"^#{1,6} ([^\n]*)$", text_block)
+            match = re.match(r"^#{1,6} +([^\n]*)$", text_block)
             if match:
-                return match.group(0)
+                return match.group(1)
             raise ValueError("invalid heading block??")
         case BlockType.UNOLIST:
-            return "\n".join(re.findall(r"^- ([^\n]*)$", text_block, flags=re.MULTILINE))
+            return "\n".join(re.findall(r"^- +([^\n]*)$", text_block, flags=re.MULTILINE))
         case BlockType.OLIST:
-            return "\n".join(re.findall(r"^\d+\. ([^\n]*)$", text_block, flags=re.MULTILINE))
+            return "\n".join(re.findall(r"^\d+\. +([^\n]*)$", text_block, flags=re.MULTILINE))
         case BlockType.PARAGRAPH:
             return " ".join(text_block.split("\n"))
         case _:
@@ -81,6 +81,9 @@ def get_block_tag(text_block: str) -> str:
         case BlockType.PARAGRAPH:
             return "p"
         case BlockType.HEADING:
-            return len(re.findall(r"^(#+)", text_block))*"#"
+            header = re.match(r'^(#+)', text_block)
+            if header:
+                return f"h{len(header.group(0))}"
+            raise Exception("not a valid header?! space-time distortion contradicts contradiction")
         case _:
             raise Exception("no valid block type tag found (or not implemented!!)")
