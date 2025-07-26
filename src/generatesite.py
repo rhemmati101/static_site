@@ -10,6 +10,13 @@ def extract_title(markdown: str) -> str:
 
     raise Exception("no title found")
 
+def get_file_contents(filepath: str) -> str:
+    if not os.path.exists(filepath):
+        raise Exception(f"path {filepath} not found")
+    
+    with open(filepath) as file:
+        return file.read()
+
 def generate_page(from_path: str, template_path: str, dest_path: str) -> None:
     print(f"Generating page from {from_path} to {dest_path} using {template_path}")
 
@@ -29,14 +36,25 @@ def generate_page(from_path: str, template_path: str, dest_path: str) -> None:
 
     with open(dest_path, "w") as file:
         file.write(html_page)
-    
 
 
+def generate_pages_recursive(dir_path_content: str, template_path: str, dest_dir_path: str) -> None:
+    if not os.path.exists(dir_path_content):
+        raise ValueError("invalid content path passed as input")
+    if not os.path.exists(template_path):
+        raise ValueError("invalid template path passed as input")
 
+    contents: list[str] = os.listdir(dir_path_content)
+    print(f"contents of {dir_path_content}: {contents}")
 
-def get_file_contents(filepath: str) -> str:
-    if not os.path.exists(filepath):
-        raise Exception(f"path {filepath} not found")
-    
-    with open(filepath) as file:
-        return file.read()
+    for c in contents:
+        c_path = os.path.join(dir_path_content, c)
+        dest_c_path = os.path.join(dest_dir_path, c)
+
+        if os.path.isfile(c_path):
+            dest_html_path: str = os.path.splitext(dest_c_path)[0] + ".html"
+            generate_page(c_path, template_path, dest_html_path)
+        elif os.path.isdir(c_path):
+            generate_pages_recursive(c_path, template_path, dest_c_path)
+        else:
+            raise NotImplementedError()

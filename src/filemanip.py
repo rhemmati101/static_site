@@ -13,9 +13,11 @@ def copy_directory(source_path: str, destination_path: str) -> None:
     os.mkdir(destination_path)
 
     #copy files from source to destination
-    recursive_copy(source_path, destination_path, "")
+    recursive_copy(source_path, destination_path)
 
-def recursive_copy(source_path: str, destination_path: str, extension_from_paths: str) -> None:
+
+#technically doesn't need the third argument but oh well
+def recursive_copy(source_path: str, destination_path: str, extension_from_paths: str = "") -> None:
     curr_source_path: str = os.path.join(source_path, extension_from_paths)
     curr_destination_path: str = os.path.join(destination_path, extension_from_paths)
     
@@ -24,7 +26,7 @@ def recursive_copy(source_path: str, destination_path: str, extension_from_paths
     
     #source path input is a directory if it has made it here
     contents: list[str] = os.listdir(curr_source_path)
-    print(f"contents of {curr_source_path}: {contents}")
+    #print(f"contents of {curr_source_path}: {contents}")
 
     for c in contents:
         c_path: str = os.path.join(curr_source_path, c)
