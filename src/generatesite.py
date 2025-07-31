@@ -17,7 +17,7 @@ def get_file_contents(filepath: str) -> str:
     with open(filepath) as file:
         return file.read()
 
-def generate_page(from_path: str, template_path: str, dest_path: str) -> None:
+def generate_page(from_path: str, template_path: str, dest_path: str, basepath: str) -> None:
     print(f"Generating page from {from_path} to {dest_path} using {template_path}")
 
     from_text: str = get_file_contents(from_path)
@@ -28,6 +28,7 @@ def generate_page(from_path: str, template_path: str, dest_path: str) -> None:
     title: str = extract_title(from_text)
 
     html_page: str = template_text.replace("{{ Title }}", title).replace("{{ Content }}", from_text_html)
+    html_page = html_page.replace('href="/', f'href="{basepath}').replace('src="/', f'src="{basepath}')
 
 
     if not os.path.exists(os.path.dirname(dest_path)):
@@ -38,7 +39,7 @@ def generate_page(from_path: str, template_path: str, dest_path: str) -> None:
         file.write(html_page)
 
 
-def generate_pages_recursive(dir_path_content: str, template_path: str, dest_dir_path: str) -> None:
+def generate_pages_recursive(dir_path_content: str, template_path: str, dest_dir_path: str, basepath: str) -> None:
     if not os.path.exists(dir_path_content):
         raise ValueError("invalid content path passed as input")
     if not os.path.exists(template_path):
@@ -53,8 +54,8 @@ def generate_pages_recursive(dir_path_content: str, template_path: str, dest_dir
 
         if os.path.isfile(c_path):
             dest_html_path: str = os.path.splitext(dest_c_path)[0] + ".html"
-            generate_page(c_path, template_path, dest_html_path)
+            generate_page(c_path, template_path, dest_html_path, basepath)
         elif os.path.isdir(c_path):
-            generate_pages_recursive(c_path, template_path, dest_c_path)
+            generate_pages_recursive(c_path, template_path, dest_c_path, basepath)
         else:
             raise NotImplementedError()

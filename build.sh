@@ -1,0 +1,1 @@
+python3 src/main.py "/rhemmati101/static_site/"
