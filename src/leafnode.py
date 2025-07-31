@@ -13,7 +13,7 @@ class LeafNode(HTMLNode):
             return self.value
         if self.props:
             if "href" in self.props:  #link
-                return f'<a href="{self.props["href"]}">{self.value}</a>'
+                return f'<a href="{self.props["href"]}"{self.value}</a>'
             elif "src" in self.props:  #image
                 return f'<img src="{self.props["src"]}" alt="{self.props["alt"]}" />'
         return f"<{self.tag}>{self.value}</{self.tag}>"
